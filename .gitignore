@@ -5,3 +5,8 @@
 build
 **/build
 **/.idea
+**/node_modules
+
+
+*.json
+*.js

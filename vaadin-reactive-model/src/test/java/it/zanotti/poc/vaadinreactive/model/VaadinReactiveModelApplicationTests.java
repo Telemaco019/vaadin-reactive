@@ -1,13 +1,12 @@
 package it.zanotti.poc.vaadinreactive.model;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.Assert;
+import org.junit.Test;
 
-@SpringBootTest
-class VaadinReactiveModelApplicationTests {
+public class VaadinReactiveModelApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    public void test() {
+        Assert.assertEquals("", "");
+    }
 }

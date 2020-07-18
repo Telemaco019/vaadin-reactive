@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testImplementation 'junit:junit:4+'
+        testCompile 'junit:junit:4+'
+
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
+        annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    }
+
+    test {
+        useJUnit()
+    }
+}
