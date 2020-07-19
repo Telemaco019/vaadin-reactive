@@ -27,6 +27,7 @@ public class TodoContainer extends VerticalLayout {
         add(titleLabel);
 
         setSizeFull();
+        setAlignItems(Alignment.CENTER);
         refreshTitleLabelVisibility();
     }
 
@@ -39,6 +40,7 @@ public class TodoContainer extends VerticalLayout {
     private VerticalLayout createTodoCard(Todo todo) {
         VerticalLayout card = new VerticalLayout();
         card.setPadding(Boolean.TRUE);
+        card.setWidth("30%");
 
         card.add(new Label(String.format("Created on %s", todo.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))));
         card.add(new Label(todo.getDescription()));
