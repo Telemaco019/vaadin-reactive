@@ -7,6 +7,8 @@ import it.zanotti.poc.vaadinreactive.engine.db.daos.TodoDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,12 +28,33 @@ public class EngineTodoService implements TodoService {
     }
 
     @Override
+    public Flux<Todo> getTodosFlux() {
+        Stream<Todo> todosStream = getAllTodos();
+        return Flux.fromStream(todosStream);
+    }
+
+    @Override
     public Stream<Todo> getTodosStream() {
+        return getAllTodos();
+    }
+
+    private Stream<Todo> getAllTodos() {
         return todoDao.getTodos().stream().map(converter::convertFromDb);
     }
 
     @Override
-    public Optional<Todo> getTodoById(Integer todoId) {
+    public Mono<Todo> getTodoMonoById(Integer todoId) {
+        return getTodoById(todoId)
+                .map(Mono::just)
+                .orElse(Mono.empty());
+    }
+
+    @Override
+    public Optional<Todo> getTodoOptionalById(Integer todoId) {
+        return getTodoById(todoId);
+    }
+
+    private Optional<Todo> getTodoById(Integer todoId) {
         return todoDao.getTodoById(todoId).map(converter::convertFromDb);
     }
 }

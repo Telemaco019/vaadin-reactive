@@ -5,7 +5,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.annotation.UIScope;
-import it.zanotti.poc.vaadinreactive.model.AppConstants;
+import it.zanotti.poc.vaadinreactive.core.utils.AppConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

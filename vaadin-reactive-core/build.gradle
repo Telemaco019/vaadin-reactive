@@ -3,3 +3,7 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 }
+
+dependencies {
+	compile group: 'io.projectreactor', name: 'reactor-core', version: '3.3.7.RELEASE'
+}

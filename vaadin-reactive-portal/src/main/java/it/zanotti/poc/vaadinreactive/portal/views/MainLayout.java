@@ -11,7 +11,6 @@ import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouterLink;
-import it.zanotti.poc.vaadinreactive.model.AppConstants;
 import org.apache.commons.compress.utils.Lists;
 
 import javax.annotation.PostConstruct;

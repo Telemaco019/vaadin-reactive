@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author Michele Zanotti on 18/07/20
@@ -25,14 +26,23 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    @GetMapping("/api/todos")
-    public Flux<Todo> getTodos() {
-        return Flux.fromStream(todoService.getTodosStream());
+    @GetMapping("/api/reactive/todos")
+    public Flux<Todo> getTodosReactive() {
+        return todoService.getTodosFlux();
     }
 
-    @GetMapping("/api/todo/{todoId}")
-    public Mono<Todo> getTodo(@PathVariable Integer todoId) {
-        Optional<Todo> todo = todoService.getTodoById(todoId);
-        return todo.map(Mono::just).orElse(Mono.empty());
+    @GetMapping("/api/blocking/todos")
+    public Stream<Todo> getTodosBlocking() {
+        return todoService.getTodosStream();
+    }
+
+    @GetMapping("/api/reactive/todos/{todoId}")
+    public Mono<Todo> getTodoReactive(@PathVariable Integer todoId) {
+        return todoService.getTodoMonoById(todoId);
+    }
+
+    @GetMapping("/api/blocking/todos/{todoId}")
+    public Optional<Todo> getTodoBlocking(@PathVariable Integer todoId) {
+        return todoService.getTodoOptionalById(todoId);
     }
 }
