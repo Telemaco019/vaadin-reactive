@@ -42,6 +42,7 @@ public class PortalTodoService implements TodoService {
                 .uri("/blocking/todos")
                 .retrieve()
                 .bodyToFlux(Todo.class)
+                .log()
                 .toStream();
     }
 
@@ -50,7 +51,8 @@ public class PortalTodoService implements TodoService {
         return webClient.get()
                 .uri("/reactive/todos/{id}", todoId)
                 .retrieve()
-                .bodyToMono(Todo.class);
+                .bodyToMono(Todo.class)
+                .log();
     }
 
     @Override
@@ -59,6 +61,7 @@ public class PortalTodoService implements TodoService {
                 .uri("/blocking/todos/{id}", todoId)
                 .retrieve()
                 .bodyToMono(Todo.class)
+                .log()
                 .blockOptional();
     }
 }
