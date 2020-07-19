@@ -7,10 +7,11 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.material.Material;
 import org.apache.commons.compress.utils.Lists;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +22,7 @@ import java.util.List;
  * @author Michele Zanotti on 12/07/20
  **/
 @Push
+@Theme(value = Material.class, variant = Material.DARK)
 public class MainLayout extends AppLayout {
 
     private Tabs navigationMenu;
@@ -62,9 +64,7 @@ public class MainLayout extends AppLayout {
     private Tab createTab(String title, VaadinIcon icon, Class<? extends Component> navigationTarget) {
         RouterLink routerLink = new RouterLink(title, navigationTarget);
         routerLink.add(icon.create());
-        Tab tab = new Tab(routerLink);
-        tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-        return tab;
+        return new Tab(routerLink);
     }
 
     @Override

@@ -32,7 +32,8 @@ public class PortalTodoService implements TodoService {
         return webClient.get()
                 .uri("/reactive/todos")
                 .retrieve()
-                .bodyToFlux(Todo.class);
+                .bodyToFlux(Todo.class)
+                .log();
     }
 
     @Override
