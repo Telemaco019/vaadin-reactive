@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -30,7 +31,7 @@ public class EngineTodoService implements TodoService {
     @Override
     public Flux<Todo> getTodosFlux() {
         Stream<Todo> todosStream = getAllTodos();
-        return Flux.fromStream(todosStream);
+        return Flux.fromStream(todosStream).delayElements(Duration.ofSeconds(2));
     }
 
     @Override
