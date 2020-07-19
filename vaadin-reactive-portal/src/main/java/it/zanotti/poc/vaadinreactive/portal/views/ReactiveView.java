@@ -6,6 +6,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import it.zanotti.poc.vaadinreactive.core.model.Todo;
 import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.core.utils.AppConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
 /**
  * @author Michele Zanotti on 12/07/20
  **/
+@Slf4j
 @RouteAlias(value = StringUtils.EMPTY, layout = MainLayout.class)
 @Route(value = AppConstants.ROUTE_NAME_REACTIVE, layout = MainLayout.class)
 @Component
@@ -34,11 +36,11 @@ public class ReactiveView extends BaseView {
     }
 
     @Override
-    protected void loadAllTodos(Consumer<Todo> onTodoLoadedCallback, Runnable onAllTodosLoadedCallback) {
+    protected void onLoadAllTodosClicked() {
         Disposable subscription = getTodoService().getTodosFlux().subscribe(
-                onTodoLoadedCallback,
+                this::accessUIAndDrawTodo,
                 this::accessUIAndShowErrorDialog,
-                onAllTodosLoadedCallback
+                this::onAllTodosLoaded
         );
 
         // Dispose the previous subscription (if any) and replace it with the new one.
@@ -47,15 +49,32 @@ public class ReactiveView extends BaseView {
         loadAllTodosDisposableContainer.update(subscription);
     }
 
+    private void onAllTodosLoaded() {
+        accessUIAndExecuteAction(() -> showDialogWithMessage("All toods have been loaded"));
+    }
+
     @Override
-    protected void loadTodoById(Integer id, Consumer<Todo> onTodoLoadedCallback) {
-        Disposable subscription = getTodoService().getTodoMonoById(id)
-                .switchIfEmpty(Mono.error(new NoSuchElementException(String.format("Todo with id %d not found", id))))
+    protected void onLoadTodoByIdClicked(Integer todoId) {
+        Disposable subscription = getTodoService().getTodoMonoById(todoId)
+                .switchIfEmpty(Mono.error(new NoSuchElementException(String.format("Todo with id %d not found", todoId))))
                 .subscribe(
-                        onTodoLoadedCallback,
+                        this::accessUIAndDrawTodo,
                         this::accessUIAndShowErrorDialog
                 );
 
         loadTodoByIdDisposableContainer.update(subscription);
+    }
+
+    private void accessUIAndDrawTodo(Todo todo) {
+        log.info("Drawing todo with id {}", todo.getId());
+        accessUIAndExecuteAction(() -> getTodoContainer().addTodo(todo));
+    }
+
+    private void accessUIAndShowErrorDialog(Throwable throwable) {
+        accessUIAndExecuteAction(() -> showDialogWithMessage(throwable.getMessage()));
+    }
+
+    private void accessUIAndExecuteAction(Runnable action) {
+        getUI().ifPresent(ui -> ui.access(action::run));
     }
 }

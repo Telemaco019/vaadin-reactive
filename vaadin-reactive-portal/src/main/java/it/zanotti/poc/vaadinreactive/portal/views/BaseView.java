@@ -9,13 +9,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import it.zanotti.poc.vaadinreactive.core.model.Todo;
 import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.function.Consumer;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -32,7 +29,7 @@ public abstract class BaseView extends VerticalLayout {
     }
 
     private void initGui() {
-        Button loadTodosButton = new Button("Load all Todos", e -> loadAndDisplayTodos());
+        Button loadTodosButton = new Button("Load all Todos", e -> onLoadAllTodosClicked());
         add(loadTodosButton);
 
         HorizontalLayout loadSingleTodoLayout = createLoadSingleTodoLayout();
@@ -43,17 +40,6 @@ public abstract class BaseView extends VerticalLayout {
         add(todoContainer);
 
         setAlignItems(Alignment.CENTER);
-    }
-
-    private void loadAndDisplayTodos() {
-        todoContainer.initGui();
-        loadAllTodos(this::accessUIAndDrawTodo, this::accessUIAndShowDialogAllTodosLoaded);
-    }
-
-    private void accessUIAndShowDialogAllTodosLoaded() {
-        Dialog dialog = new Dialog();
-        dialog.add(new Label("All todos have been loaded"));
-        executeActionWithinUI(dialog::open);
     }
 
     private HorizontalLayout createLoadSingleTodoLayout() {
@@ -68,7 +54,7 @@ public abstract class BaseView extends VerticalLayout {
         todoIdTextfield.setValueChangeMode(ValueChangeMode.EAGER);
 
         todoIdTextfield.addValueChangeListener(e -> loadTodoButton.setEnabled(StringUtils.isNotEmpty(e.getValue())));
-        loadTodoButton.addClickListener(e -> loadAndDisplayTodo(Integer.valueOf(todoIdTextfield.getValue())));
+        loadTodoButton.addClickListener(e -> onLoadTodoByIdClicked(Integer.valueOf(todoIdTextfield.getValue())));
 
         layout.add(todoIdTextfield);
         layout.add(loadTodoButton);
@@ -76,31 +62,22 @@ public abstract class BaseView extends VerticalLayout {
         return layout;
     }
 
-    private void loadAndDisplayTodo(Integer todoId) {
-        todoContainer.initGui();
-        loadTodoById(todoId, this::accessUIAndDrawTodo);
+    protected abstract void onLoadAllTodosClicked();
+
+    protected abstract void onLoadTodoByIdClicked(Integer todoId);
+
+    protected TodoContainer getTodoContainer() {
+        return todoContainer;
     }
-
-    private void accessUIAndDrawTodo(Todo todo) {
-        log.info("Drawing todo with id {}", todo.getId());
-        executeActionWithinUI(() -> todoContainer.addTodo(todo));
-    }
-
-    protected abstract void loadAllTodos(Consumer<Todo> onTodoLoadedCallback, Runnable onAllTodosLoadedCallback);
-
-    protected abstract void loadTodoById(Integer id, Consumer<Todo> onTodoLoadedCallback);
 
     protected TodoService getTodoService() {
         return todoService;
     }
 
-    protected void accessUIAndShowErrorDialog(Throwable throwable) {
+    protected void showDialogWithMessage(String message) {
         Dialog dialog = new Dialog();
-        dialog.add(new Label(throwable.getMessage()));
-        executeActionWithinUI(dialog::open);
+        dialog.add(new Label(message));
+        dialog.open();
     }
 
-    private void executeActionWithinUI(Runnable action) {
-        getUI().ifPresent(ui -> ui.access(action::run));
-    }
 }

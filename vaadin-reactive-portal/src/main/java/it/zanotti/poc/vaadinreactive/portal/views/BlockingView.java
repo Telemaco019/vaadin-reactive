@@ -7,7 +7,7 @@ import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.core.utils.AppConstants;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Consumer;
+import java.util.Optional;
 
 /**
  * @author Michele Zanotti on 12/07/20
@@ -21,13 +21,21 @@ public class BlockingView extends BaseView {
     }
 
     @Override
-    protected void loadAllTodos(Consumer<Todo> onTodoLoadedCallback, Runnable onAllTodosLoadedCallback) {
-        getTodoService().getTodosStream().forEach(onTodoLoadedCallback);
-        onAllTodosLoadedCallback.run();
+    protected void onLoadAllTodosClicked() {
+        getTodoService().getTodosStream().forEach(this::drawTodo);
     }
 
     @Override
-    protected void loadTodoById(Integer id, Consumer<Todo> onTodoLoadedCallback) {
-        getTodoService().getTodoOptionalById(id).ifPresent(onTodoLoadedCallback);
+    protected void onLoadTodoByIdClicked(Integer todoId) {
+        Optional<Todo> todoOpt = getTodoService().getTodoOptionalById(todoId);
+        if (todoOpt.isPresent()) {
+            drawTodo(todoOpt.get());
+        } else {
+            showDialogWithMessage(String.format("Todo with id %d not found", todoId));
+        }
+    }
+
+    private void drawTodo(Todo todo) {
+        getTodoContainer().addTodo(todo);
     }
 }
