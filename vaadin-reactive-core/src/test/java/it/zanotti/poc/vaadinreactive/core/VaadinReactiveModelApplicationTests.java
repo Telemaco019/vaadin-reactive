@@ -1,4 +1,4 @@
-package it.zanotti.poc.vaadinreactive.model;
+package it.zanotti.poc.vaadinreactive.core;
 
 import org.junit.Assert;
 import org.junit.Test;

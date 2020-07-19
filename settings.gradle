@@ -10,5 +10,5 @@
 rootProject.name = 'VaadinReactive'
 
 include 'vaadin-reactive-engine'
-include 'vaadin-reactive-model'
+include 'vaadin-reactive-core'
 include 'vaadin-reactive-portal'

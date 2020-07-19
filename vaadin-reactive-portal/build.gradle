@@ -17,7 +17,7 @@ dependencies {
 	}
 	testImplementation 'io.projectreactor:reactor-test'
 
-	compileOnly(project(":vaadin-reactive-model"))
+	compileOnly(project(":vaadin-reactive-core"))
 }
 
 dependencyManagement {

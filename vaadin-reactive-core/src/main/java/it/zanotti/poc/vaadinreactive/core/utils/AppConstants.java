@@ -1,4 +1,4 @@
-package it.zanotti.poc.vaadinreactive.model;
+package it.zanotti.poc.vaadinreactive.core.utils;
 
 /**
  * @author Michele Zanotti on 18/07/20

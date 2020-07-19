@@ -16,6 +16,8 @@ subprojects {
 
         compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
         annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+        compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
     }
 
     test {
