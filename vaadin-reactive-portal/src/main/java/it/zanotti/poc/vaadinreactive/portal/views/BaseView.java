@@ -2,6 +2,7 @@ package it.zanotti.poc.vaadinreactive.portal.views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -46,7 +47,13 @@ public abstract class BaseView extends VerticalLayout {
 
     private void loadAndDisplayTodos() {
         todoContainer.initGui();
-        loadAllTodos(this::accessUIAndDrawTodo);
+        loadAllTodos(this::accessUIAndDrawTodo, this::accessUIAndShowDialogAllTodosLoaded);
+    }
+
+    private void accessUIAndShowDialogAllTodosLoaded() {
+        Dialog dialog = new Dialog();
+        dialog.add(new Label("All todos have been loaded"));
+        executeActionWithinUI(dialog::open);
     }
 
     private HorizontalLayout createLoadSingleTodoLayout() {
@@ -76,14 +83,24 @@ public abstract class BaseView extends VerticalLayout {
 
     private void accessUIAndDrawTodo(Todo todo) {
         log.info("Drawing todo with id {}", todo.getId());
-        getUI().ifPresent(ui -> ui.access(() -> todoContainer.addTodo(todo)));
+        executeActionWithinUI(() -> todoContainer.addTodo(todo));
     }
 
-    protected abstract void loadAllTodos(Consumer<Todo> onTodoLoadedCallback);
+    protected abstract void loadAllTodos(Consumer<Todo> onTodoLoadedCallback, Runnable onAllTodosLoadedCallback);
 
     protected abstract void loadTodoById(Integer id, Consumer<Todo> onTodoLoadedCallback);
 
     protected TodoService getTodoService() {
         return todoService;
+    }
+
+    protected void accessUIAndShowErrorDialog(Throwable throwable) {
+        Dialog dialog = new Dialog();
+        dialog.add(new Label(throwable.getMessage()));
+        executeActionWithinUI(dialog::open);
+    }
+
+    private void executeActionWithinUI(Runnable action) {
+        getUI().ifPresent(ui -> ui.access(action::run));
     }
 }

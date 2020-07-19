@@ -36,6 +36,7 @@ public class EngineTodoService implements TodoService {
 
     @Override
     public Stream<Todo> getTodosStream() {
+        performSomeHeavyComputation();
         return getAllTodos();
     }
 
@@ -57,5 +58,13 @@ public class EngineTodoService implements TodoService {
 
     private Optional<Todo> getTodoById(Integer todoId) {
         return todoDao.getTodoById(todoId).map(converter::convertFromDb);
+    }
+
+    private void performSomeHeavyComputation() {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            log.error("{}", e.getMessage(), e);
+        }
     }
 }

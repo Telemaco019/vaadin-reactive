@@ -21,12 +21,13 @@ public class BlockingView extends BaseView {
     }
 
     @Override
-    protected void loadAllTodos(Consumer<Todo> onTodoLoadedCallback) {
-
+    protected void loadAllTodos(Consumer<Todo> onTodoLoadedCallback, Runnable onAllTodosLoadedCallback) {
+        getTodoService().getTodosStream().forEach(onTodoLoadedCallback);
+        onAllTodosLoadedCallback.run();
     }
 
     @Override
     protected void loadTodoById(Integer id, Consumer<Todo> onTodoLoadedCallback) {
-
+        getTodoService().getTodoOptionalById(id).ifPresent(onTodoLoadedCallback);
     }
 }
