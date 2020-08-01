@@ -27,27 +27,15 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    @GetMapping(value = "/api/reactive/todos", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    @GetMapping(value = "/api/todos", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<Todo> getTodosReactive() {
         log.info("Loading todo flux");
-        return todoService.getTodosFlux();
+        return todoService.getTodos();
     }
 
-    @GetMapping("/api/blocking/todos")
-    public Stream<Todo> getTodosBlocking() {
-        log.info("Loading todo stream");
-        return todoService.getTodosStream();
-    }
-
-    @GetMapping("/api/reactive/todos/{todoId}")
+    @GetMapping("/api/todos/{todoId}")
     public Mono<Todo> getTodoReactive(@PathVariable Integer todoId) {
         log.info("Loading todo Mono with ID {}", todoId);
-        return todoService.getTodoMonoById(todoId);
-    }
-
-    @GetMapping("/api/blocking/todos/{todoId}")
-    public Optional<Todo> getTodoBlocking(@PathVariable Integer todoId) {
-        log.info("Loading todo Optional with ID {}", todoId);
-        return todoService.getTodoOptionalById(todoId);
+        return todoService.getTodoById(todoId);
     }
 }

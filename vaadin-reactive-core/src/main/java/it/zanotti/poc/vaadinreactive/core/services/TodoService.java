@@ -11,11 +11,7 @@ import java.util.stream.Stream;
  * @author Michele Zanotti on 19/07/20
  **/
 public interface TodoService {
-    Flux<Todo> getTodosFlux();
+    Flux<Todo> getTodos();
 
-    Stream<Todo> getTodosStream();
-
-    Mono<Todo> getTodoMonoById(Integer todoId);
-
-    Optional<Todo> getTodoOptionalById(Integer todoId);
+    Mono<Todo> getTodoById(Integer todoId);
 }

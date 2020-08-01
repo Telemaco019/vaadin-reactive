@@ -29,15 +29,9 @@ public class EngineTodoService implements TodoService {
     }
 
     @Override
-    public Flux<Todo> getTodosFlux() {
+    public Flux<Todo> getTodos() {
         Stream<Todo> todosStream = getAllTodos();
         return Flux.fromStream(todosStream).delayElements(Duration.ofSeconds(2));
-    }
-
-    @Override
-    public Stream<Todo> getTodosStream() {
-        performSomeHeavyComputation();
-        return getAllTodos();
     }
 
     private Stream<Todo> getAllTodos() {
@@ -45,18 +39,13 @@ public class EngineTodoService implements TodoService {
     }
 
     @Override
-    public Mono<Todo> getTodoMonoById(Integer todoId) {
-        return getTodoById(todoId)
+    public Mono<Todo> getTodoById(Integer todoId) {
+        return fetchTodoById(todoId)
                 .map(Mono::just)
                 .orElse(Mono.empty());
     }
 
-    @Override
-    public Optional<Todo> getTodoOptionalById(Integer todoId) {
-        return getTodoById(todoId);
-    }
-
-    private Optional<Todo> getTodoById(Integer todoId) {
+    private Optional<Todo> fetchTodoById(Integer todoId) {
         return todoDao.getTodoById(todoId).map(converter::convertFromDb);
     }
 

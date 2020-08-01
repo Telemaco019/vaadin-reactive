@@ -9,9 +9,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
 /**
  * @author Michele Zanotti on 18/07/20
  **/
@@ -28,40 +25,20 @@ public class PortalTodoService implements TodoService {
     }
 
     @Override
-    public Flux<Todo> getTodosFlux() {
+    public Flux<Todo> getTodos() {
         return webClient.get()
-                .uri("/reactive/todos")
+                .uri("/todos")
                 .retrieve()
                 .bodyToFlux(Todo.class)
                 .log();
     }
 
     @Override
-    public Stream<Todo> getTodosStream() {
+    public Mono<Todo> getTodoById(Integer todoId) {
         return webClient.get()
-                .uri("/blocking/todos")
-                .retrieve()
-                .bodyToFlux(Todo.class)
-                .log()
-                .toStream();
-    }
-
-    @Override
-    public Mono<Todo> getTodoMonoById(Integer todoId) {
-        return webClient.get()
-                .uri("/reactive/todos/{id}", todoId)
+                .uri("/todos/{id}", todoId)
                 .retrieve()
                 .bodyToMono(Todo.class)
                 .log();
-    }
-
-    @Override
-    public Optional<Todo> getTodoOptionalById(Integer todoId) {
-        return webClient.get()
-                .uri("/blocking/todos/{id}", todoId)
-                .retrieve()
-                .bodyToMono(Todo.class)
-                .log()
-                .blockOptional();
     }
 }
