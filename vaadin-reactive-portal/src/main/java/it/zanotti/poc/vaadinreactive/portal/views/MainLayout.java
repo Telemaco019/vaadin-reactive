@@ -52,11 +52,8 @@ public class MainLayout extends AppLayout {
     private Tab[] createNavigationTabs() {
         List<Tab> tabs = Lists.newArrayList();
 
-        Tab reactivePageTab = createTab("Reactive", VaadinIcon.BOLT, ReactiveView.class);
+        Tab reactivePageTab = createTab("Todo List", VaadinIcon.BOLT, TodoListView.class);
         tabs.add(reactivePageTab);
-
-        Tab blockingPageTab = createTab("Blocking", VaadinIcon.ALARM, BlockingView.class);
-        tabs.add(blockingPageTab);
 
         return tabs.toArray(new Tab[0]);
     }
