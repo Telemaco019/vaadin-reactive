@@ -4,6 +4,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import it.zanotti.poc.vaadinreactive.core.model.Todo;
 import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -37,6 +38,17 @@ public class PortalTodoService implements TodoService {
     public Mono<Todo> getTodoById(Integer todoId) {
         return webClient.get()
                 .uri("/todos/{id}", todoId)
+                .retrieve()
+                .bodyToMono(Todo.class)
+                .log();
+    }
+
+    @Override
+    public Mono<Todo> saveOrUpdateTodo(Todo todo) {
+        return webClient.post()
+                .uri("/todos")
+                .contentType(MediaType.APPLICATION_JSON) // content type of the body of the request
+                .body(todo, Todo.class)
                 .retrieve()
                 .bodyToMono(Todo.class)
                 .log();
