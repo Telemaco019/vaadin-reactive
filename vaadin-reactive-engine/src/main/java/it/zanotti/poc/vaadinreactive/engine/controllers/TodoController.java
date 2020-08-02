@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,5 +36,11 @@ public class TodoController {
     public Mono<Todo> getTodoReactive(@PathVariable Integer todoId) {
         log.info("Received load todo by id {} request", todoId);
         return todoService.getTodoById(todoId);
+    }
+
+    @PostMapping("/api/todos")
+    public Mono<Todo> saveOrUpdateTodo(@RequestBody Todo todo) {
+        log.info("Received save or update todo request");
+        return todoService.saveOrUpdateTodo(todo);
     }
 }
