@@ -26,13 +26,13 @@ public class TodoController {
 
     @GetMapping(value = "/api/todos", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<Todo> getTodosReactive() {
-        log.info("Loading todo flux");
+        log.info("Received load todos request");
         return todoService.getTodos();
     }
 
     @GetMapping("/api/todos/{todoId}")
     public Mono<Todo> getTodoReactive(@PathVariable Integer todoId) {
-        log.info("Loading todo Mono with ID {}", todoId);
+        log.info("Received load todo by id {} request", todoId);
         return todoService.getTodoById(todoId);
     }
 }

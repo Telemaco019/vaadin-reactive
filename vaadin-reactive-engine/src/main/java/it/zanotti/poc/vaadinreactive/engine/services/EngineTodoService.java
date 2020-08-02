@@ -28,14 +28,18 @@ public class EngineTodoService implements TodoService {
 
     @Override
     public Flux<Todo> getTodos() {
-        return Flux.empty();
+        return todoRepository.findAll()
+                .map(converter::convertFromDb)
+                .doOnNext(todo -> log.debug("Loaded todo {}", todo.toString()))
+                .doOnComplete(() -> log.debug("All todos have been loaded"))
+                .doOnError(e -> log.error("Error loading todos: {}", e.getMessage(), e));
     }
 
     @Override
     public Mono<Todo> getTodoById(Integer todoId) {
-        return fetchTodoById(todoId)
-                .map(Mono::just)
-                .orElse(Mono.empty());
+        return Mono.justOrEmpty(fetchTodoById(todoId))
+                .doOnSuccess(todo -> log.debug("Loaded todo with id {}", todo.getId()))
+                .doOnError(e -> log.error("Error loading todo with id {}: {}", todoId, e.getMessage(), e));
     }
 
     private Optional<Todo> fetchTodoById(Integer todoId) {
