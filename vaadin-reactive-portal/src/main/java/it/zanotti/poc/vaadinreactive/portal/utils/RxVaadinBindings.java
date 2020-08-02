@@ -17,7 +17,7 @@ import java.util.Objects;
  **/
 public final class RxVaadinBindings {
     private RxVaadinBindings() {
-        throw new UnsupportedOperationException("Utility class not supposed to be istantiated");
+        throw new UnsupportedOperationException("Utility class not supposed to be instantiated");
     }
 
     public static Flux<Object> onButtonClicks(ClickNotifier<Button> clickNotifier) {
@@ -33,17 +33,17 @@ public final class RxVaadinBindings {
 
         @Override
         public void subscribe(CoreSubscriber<? super Object> subscriber) {
-            DisposableListener<C> disposableListener = new DisposableListener<>(subscriber);
-            Registration registration = clickNotifier.addClickListener(disposableListener);
-            disposableListener.setListenerRegistration(registration);
+            DisposableClickListener<C> disposableClickListener = new DisposableClickListener<>(subscriber);
+            Registration registration = clickNotifier.addClickListener(disposableClickListener);
+            disposableClickListener.setListenerRegistration(registration);
         }
     }
 
-    private static class DisposableListener<C extends Component> implements Disposable, ComponentEventListener<ClickEvent<C>> {
+    private static class DisposableClickListener<C extends Component> implements Disposable, ComponentEventListener<ClickEvent<C>> {
         private final CoreSubscriber subscriber;
         private Registration listenerRegistration;
 
-        private DisposableListener(CoreSubscriber<?> subscriber) {
+        private DisposableClickListener(CoreSubscriber<?> subscriber) {
             this.subscriber = subscriber;
         }
 
