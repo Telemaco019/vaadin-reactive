@@ -9,5 +9,4 @@ public class VaadinReactiveEngineApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(VaadinReactiveEngineApplication.class, args);
 	}
-
 }

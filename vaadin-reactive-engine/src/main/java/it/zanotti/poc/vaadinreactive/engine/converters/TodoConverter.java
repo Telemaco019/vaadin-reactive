@@ -12,7 +12,7 @@ public class TodoConverter {
 
         result.setId(todo.getId());
         result.setCreationDate(todo.getCreationDate());
-        result.setDescription(todo.getDescription());
+        result.setDescription(todo.getText());
 
         return result;
     }
@@ -22,7 +22,7 @@ public class TodoConverter {
 
         result.setId(todo.getId());
         result.setCreationDate(todo.getCreationDate());
-        result.setDescription(todo.getDescription());
+        result.setText(todo.getDescription());
 
         return result;
     }

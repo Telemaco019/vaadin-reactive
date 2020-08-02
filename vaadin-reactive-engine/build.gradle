@@ -1,14 +1,26 @@
 plugins {
-	id 'org.springframework.boot' version '2.3.1.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
-	testImplementation 'io.projectreactor:reactor-test'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	compile project(':vaadin-reactive-core')
+    // Required for processing Spring annotations such as @ConfigurationProperties
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    // Required for performing bean validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Persistence dependencies
+    implementation 'org.springframework.data:spring-data-r2dbc:1.1.2.RELEASE'
+    implementation 'org.mariadb:r2dbc-mariadb:0.8.3-beta1'
+
+    // Test dependencies
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'io.projectreactor:reactor-test'
+
+    // Internal dependencies
+    compile project(':vaadin-reactive-core')
 }
