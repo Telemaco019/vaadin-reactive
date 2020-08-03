@@ -1,13 +1,8 @@
 package it.zanotti.poc.vaadinreactive.portal.views;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -21,9 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.Disposables;
-import reactor.core.publisher.Mono;
-
-import java.util.NoSuchElementException;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -35,19 +27,26 @@ import java.util.NoSuchElementException;
 @UIScope
 public class TodoListView extends VerticalLayout {
     private final TodoService todoService;
-    private final Disposable.Swap loadTodoByIdDisposableContainer;
 
     private TodoContainer todoContainer;
 
     public TodoListView(TodoService todoService) {
         this.todoService = todoService;
-        loadTodoByIdDisposableContainer = Disposables.swap();
         initGui();
     }
 
     private void initGui() {
         CreateTodoPanel createTodoLayout = new CreateTodoPanel();
         add(createTodoLayout);
+
+        todoContainer = new TodoContainer();
+        add(todoContainer);
+
+        createTodoLayout.getOnTodoCreateFlux()
+                .map(Todo::create)
+                .flatMap(todoService::saveOrUpdateTodo)
+                .doOnError(e -> log.error("{}", e.getMessage(), e))
+                .subscribe(this::accessUIAndDrawTodo, this::accessUIAndShowErrorDialog);
 
         setAlignItems(Alignment.CENTER);
     }
@@ -67,10 +66,6 @@ public class TodoListView extends VerticalLayout {
 
     private TodoContainer getTodoContainer() {
         return todoContainer;
-    }
-
-    private TodoService getTodoService() {
-        return todoService;
     }
 
     private void showDialogWithMessage(String message) {

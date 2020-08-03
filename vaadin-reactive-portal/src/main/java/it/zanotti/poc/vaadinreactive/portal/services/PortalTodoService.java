@@ -48,7 +48,7 @@ public class PortalTodoService implements TodoService {
         return webClient.post()
                 .uri("/todos")
                 .contentType(MediaType.APPLICATION_JSON) // content type of the body of the request
-                .body(todo, Todo.class)
+                .bodyValue(todo)
                 .retrieve()
                 .bodyToMono(Todo.class)
                 .log();

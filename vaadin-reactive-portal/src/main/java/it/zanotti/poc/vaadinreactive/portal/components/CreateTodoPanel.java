@@ -5,28 +5,35 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import it.zanotti.poc.vaadinreactive.core.model.Todo;
+import it.zanotti.poc.vaadinreactive.core.services.TodoService;
+import it.zanotti.poc.vaadinreactive.portal.utils.RxVaadinBindings;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Michele Zanotti on 01/08/20
  **/
+@Slf4j
 public class CreateTodoPanel extends HorizontalLayout {
 
-    private Button createTodoButton;
-    private TextField todoContentTexField;
+    private Flux<String> onTodoCreateFlux;
 
     public CreateTodoPanel() {
         initGui();
     }
 
     private void initGui() {
-        todoContentTexField = getCreateTodoTextField();
+        TextField todoContentTexField = getCreateTodoTextField();
         add(todoContentTexField);
 
-        createTodoButton = getCreateTodoButton();
+        Button createTodoButton = getCreateTodoButton();
         add(createTodoButton);
 
-        setupListeners();
+        todoContentTexField.addValueChangeListener(e -> createTodoButton.setEnabled(StringUtils.isNotEmpty(e.getValue())));
+
+        onTodoCreateFlux = RxVaadinBindings.onButtonClicks(createTodoButton).map(ignored -> todoContentTexField.getValue());
     }
 
     private Button getCreateTodoButton() {
@@ -48,19 +55,7 @@ public class CreateTodoPanel extends HorizontalLayout {
         return resultTextField;
     }
 
-    private void setupListeners() {
-        todoContentTexField.addValueChangeListener(e -> createTodoButton.setEnabled(StringUtils.isNotEmpty(e.getValue())));
-        createTodoButton.addClickListener(e -> manageCreateTodo(todoContentTexField.getValue()));
-    }
-
-    private void manageCreateTodo(String todoContent) {
-//        Disposable subscription = getTodoService().getTodoMonoById(todoId)
-//                .switchIfEmpty(Mono.error(new NoSuchElementException(String.format("Todo with id %d not found", todoId))))
-//                .subscribe(
-//                        this::accessUIAndDrawTodo,
-//                        this::accessUIAndShowErrorDialog
-//                );
-//
-//        loadTodoByIdDisposableContainer.update(subscription);
+    public Flux<String> getOnTodoCreateFlux() {
+        return onTodoCreateFlux;
     }
 }

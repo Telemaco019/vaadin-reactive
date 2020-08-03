@@ -12,7 +12,7 @@ import java.util.List;
  * @author Michele Zanotti on 19/07/20
  **/
 public class TodoContainer extends VerticalLayout {
-    private List<Todo> drawnTodos;
+    private final List<Todo> drawnTodos;
     private Label titleLabel;
 
     public TodoContainer() {
