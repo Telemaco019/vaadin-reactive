@@ -8,6 +8,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.shared.Registration;
 import reactor.core.CoreSubscriber;
 import reactor.core.Disposable;
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 
 import java.util.Objects;
@@ -34,16 +35,17 @@ public final class RxVaadinBindings {
         @Override
         public void subscribe(CoreSubscriber<? super Object> subscriber) {
             DisposableClickListener<C> disposableClickListener = new DisposableClickListener<>(subscriber);
+            subscriber.onSubscribe(disposableClickListener);
             Registration registration = clickNotifier.addClickListener(disposableClickListener);
             disposableClickListener.setListenerRegistration(registration);
         }
     }
 
-    private static class DisposableClickListener<C extends Component> implements Disposable, ComponentEventListener<ClickEvent<C>> {
-        private final CoreSubscriber subscriber;
+    private static class DisposableClickListener<C extends Component> extends BaseSubscriber<Object> implements ComponentEventListener<ClickEvent<C>> {
+        private final CoreSubscriber<Object> subscriber;
         private Registration listenerRegistration;
 
-        private DisposableClickListener(CoreSubscriber<?> subscriber) {
+        private DisposableClickListener(CoreSubscriber<Object> subscriber) {
             this.subscriber = subscriber;
         }
 
@@ -66,7 +68,7 @@ public final class RxVaadinBindings {
 
         @Override
         public void onComponentEvent(ClickEvent<C> event) {
-            if (event.isFromClient()) {
+            if (!isDisposed()) {
                 subscriber.onNext(new Object());
             }
         }
