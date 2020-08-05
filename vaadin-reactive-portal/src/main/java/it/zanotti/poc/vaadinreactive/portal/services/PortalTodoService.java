@@ -30,8 +30,7 @@ public class PortalTodoService implements TodoService {
         return webClient.get()
                 .uri("/todos")
                 .retrieve()
-                .bodyToFlux(Todo.class)
-                .log();
+                .bodyToFlux(Todo.class);
     }
 
     @Override
@@ -39,8 +38,7 @@ public class PortalTodoService implements TodoService {
         return webClient.get()
                 .uri("/todos/{id}", todoId)
                 .retrieve()
-                .bodyToMono(Todo.class)
-                .log();
+                .bodyToMono(Todo.class);
     }
 
     @Override
@@ -48,9 +46,8 @@ public class PortalTodoService implements TodoService {
         return webClient.post()
                 .uri("/todos")
                 .contentType(MediaType.APPLICATION_JSON) // content type of the body of the request
-                .bodyValue(todo)
+                .body(Mono.just(todo), Todo.class) // or, equivalently, it could be .bodyValue(todo)
                 .retrieve()
-                .bodyToMono(Todo.class)
-                .log();
+                .bodyToMono(Todo.class);
     }
 }
