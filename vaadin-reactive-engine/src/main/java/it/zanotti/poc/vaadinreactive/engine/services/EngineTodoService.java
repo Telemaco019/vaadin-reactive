@@ -48,9 +48,9 @@ public class EngineTodoService implements TodoService {
     public Mono<Todo> saveOrUpdateTodo(Todo todo) {
         TodoDto todoDto = converter.convertToDb(todo);
         return todoRepository.save(todoDto)
-                .doOnError(e -> log.info("Error saving todo: {}", e.getMessage(), e))
+                .doOnError(e -> log.error("Error saving todo: {}", e.getMessage(), e))
                 .map(converter::convertFromDb)
-                .doOnError(e -> log.info("Error converting dto to model: {}", e.getMessage()));
+                .doOnError(e -> log.error("Error converting dto to model: {}", e.getMessage()));
     }
 
     private Optional<Todo> fetchTodoById(Integer todoId) {
