@@ -30,6 +30,7 @@ public class AppConfig extends AbstractR2dbcConfiguration {
                 .host(configProps.getHost())
                 .password(configProps.getPassword())
                 .username(configProps.getUsername())
+                .port(Integer.parseInt(configProps.getPort()))
                 .build();
         return new MariadbConnectionFactory(config);
     }
