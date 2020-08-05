@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @author Michele Zanotti on 18/07/20
@@ -17,7 +18,7 @@ public class TodoDto {
     @Column("ID")
     private Integer id;
     @Column("CREATION_DATE")
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
     @Column("TEXT")
     private String text;
 }
