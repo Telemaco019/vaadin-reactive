@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "r2dbc")
-public class R2DBCConfigProps {
+public class R2dbcConfigProps {
     @NotBlank
     private String host;
     @NotBlank

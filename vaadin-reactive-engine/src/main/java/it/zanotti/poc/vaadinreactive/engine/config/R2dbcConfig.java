@@ -13,10 +13,10 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
  **/
 @Configuration
 public class R2dbcConfig extends AbstractR2dbcConfiguration {
-    private final R2DBCConfigProps configProps;
+    private final R2dbcConfigProps configProps;
 
     @Autowired
-    public R2dbcConfig(R2DBCConfigProps configProps) {
+    public R2dbcConfig(R2dbcConfigProps configProps) {
         this.configProps = configProps;
     }
 
