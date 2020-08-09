@@ -5,8 +5,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import it.zanotti.poc.vaadinreactive.core.model.Todo;
-import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.portal.utils.RxVaadinBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,9 +29,11 @@ public class CreateTodoPanel extends HorizontalLayout {
         Button createTodoButton = getCreateTodoButton();
         add(createTodoButton);
 
-        todoContentTexField.addValueChangeListener(e -> createTodoButton.setEnabled(StringUtils.isNotEmpty(e.getValue())));
+        todoContentTexField.addValueChangeListener(e -> createTodoButton.setEnabled(StringUtils.isNotBlank(e.getValue())));
 
-        onTodoCreateFlux = RxVaadinBindings.onButtonClicks(createTodoButton).map(ignored -> todoContentTexField.getValue());
+        onTodoCreateFlux = RxVaadinBindings.onButtonClicks(createTodoButton)
+                .map(ignored -> todoContentTexField.getValue())
+                .doOnNext(ignored -> todoContentTexField.setValue(StringUtils.EMPTY)); // accessing the UI here is not good, find another way
     }
 
     private Button getCreateTodoButton() {
