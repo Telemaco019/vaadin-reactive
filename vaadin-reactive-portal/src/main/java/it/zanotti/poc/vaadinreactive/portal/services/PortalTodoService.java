@@ -29,6 +29,7 @@ public class PortalTodoService implements TodoService {
     public Flux<Todo> getTodos() {
         return webClient.get()
                 .uri("/todos")
+                .accept(MediaType.APPLICATION_STREAM_JSON)
                 .retrieve()
                 .bodyToFlux(Todo.class);
     }

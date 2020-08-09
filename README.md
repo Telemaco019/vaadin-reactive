@@ -32,6 +32,14 @@ when making http calls.
 If the API were blocking, then it would be reasonable to use the operator subscribeOn in all the HTTP calls to the 
 engine API, placing it closest possible to the event source (that is the web client used for making the calls).
 
+__Note__: in order to make a non-blocking call that fetches a stream of values (e.g. a Flux), it is necessary to tell 
+the Spring Web Client used for making the call that it has to accept a JSON stream as media type.
+This can be done as follows:
+```
+.accept(MediaType.APPLICATION_STREAM_JSON)
+```
+
+
 ### Engine
 The operator subscribeOn is used within the services that call the repository methods, placed right after each repository
 method calls. Since the repository access the data layer, the elastic scheduler is used. 
