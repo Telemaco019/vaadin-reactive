@@ -90,7 +90,7 @@ public class TodoListView extends VerticalLayout {
                 this::accessUIAndShowErrorDialog,
                 this::accessUIAndHideLoadingInfo
         );
-        loadTodosDisposable.replace(subscription);
+        loadTodosDisposable.update(subscription); // dispose the previous Disposable and update the container with the new one
     }
 
     private void showLoadingInfo() {
