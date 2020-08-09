@@ -14,8 +14,6 @@ import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import reactor.core.Disposable;
-import reactor.core.Disposables;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -52,7 +50,7 @@ public class TodoListView extends VerticalLayout {
     }
 
     private void accessUIAndDrawTodo(Todo todo) {
-        log.info("Drawing todo with id {}", todo.getId());
+        log.debug("Drawing todo with id {}", todo.getId());
         accessUIAndExecuteAction(() -> getTodoContainer().addTodo(todo));
     }
 
