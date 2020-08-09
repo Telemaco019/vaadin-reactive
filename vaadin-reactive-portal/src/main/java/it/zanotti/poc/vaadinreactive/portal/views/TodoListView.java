@@ -1,5 +1,6 @@
 package it.zanotti.poc.vaadinreactive.portal.views;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -14,6 +15,8 @@ import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
+import reactor.core.Disposables;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -25,11 +28,13 @@ import org.springframework.stereotype.Component;
 @UIScope
 public class TodoListView extends VerticalLayout {
     private final TodoService todoService;
+    private final Disposable.Swap loadTodosDisposable;
 
     private TodoContainer todoContainer;
 
     public TodoListView(TodoService todoService) {
         this.todoService = todoService;
+        this.loadTodosDisposable = Disposables.swap();
         initGui();
     }
 
@@ -47,6 +52,14 @@ public class TodoListView extends VerticalLayout {
                 .subscribe(this::accessUIAndDrawTodo, this::accessUIAndShowErrorDialog);
 
         setAlignItems(Alignment.CENTER);
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        Disposable subscription = todoService.getTodos()
+                .subscribe(this::accessUIAndDrawTodo, this::accessUIAndShowErrorDialog);
+        loadTodosDisposable.replace(subscription);
     }
 
     private void accessUIAndDrawTodo(Todo todo) {
