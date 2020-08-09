@@ -13,28 +13,20 @@ import java.util.List;
  **/
 public class TodoContainer extends VerticalLayout {
     private final List<Todo> drawnTodos;
-    private Label titleLabel;
 
     public TodoContainer() {
         drawnTodos = Lists.newArrayList();
         initGui();
     }
 
-    public void initGui() {
-        removeAll();
-
-        titleLabel = new Label("Loaded Todos");
-        add(titleLabel);
-
+    private void initGui() {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        refreshTitleLabelVisibility();
     }
 
     public void addTodo(Todo todo) {
         drawnTodos.add(todo);
         add(createTodoCard(todo));
-        refreshTitleLabelVisibility();
     }
 
     private VerticalLayout createTodoCard(Todo todo) {
@@ -46,9 +38,5 @@ public class TodoContainer extends VerticalLayout {
         card.add(new Label(todo.getDescription()));
 
         return card;
-    }
-
-    private void refreshTitleLabelVisibility() {
-        titleLabel.setVisible(!drawnTodos.isEmpty());
     }
 }

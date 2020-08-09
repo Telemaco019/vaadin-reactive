@@ -1,8 +1,11 @@
 package it.zanotti.poc.vaadinreactive.portal.views;
 
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -31,6 +34,7 @@ public class TodoListView extends VerticalLayout {
     private final Disposable.Swap loadTodosDisposable;
 
     private TodoContainer todoContainer;
+    private HorizontalLayout loadingInfoLayout;
 
     public TodoListView(TodoService todoService) {
         this.todoService = todoService;
@@ -41,6 +45,9 @@ public class TodoListView extends VerticalLayout {
     private void initGui() {
         CreateTodoPanel createTodoLayout = new CreateTodoPanel();
         add(createTodoLayout);
+
+        loadingInfoLayout = createLoadingInfoLayout();
+        add(loadingInfoLayout);
 
         todoContainer = new TodoContainer();
         add(todoContainer);
@@ -54,12 +61,40 @@ public class TodoListView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
     }
 
+    private HorizontalLayout createLoadingInfoLayout() {
+        HorizontalLayout result = new HorizontalLayout();
+
+        var loadingIndicator = new Label("Loading todos...");
+        result.add(loadingIndicator);
+
+        var btnCancelLoading = new Button("Cancel loading", e -> loadTodosDisposable.dispose());
+        btnCancelLoading.getStyle().set("cursor", "pointer");
+        btnCancelLoading.addThemeVariants(ButtonVariant.MATERIAL_CONTAINED);
+        result.add(btnCancelLoading);
+
+        result.setAlignItems(Alignment.CENTER);
+        result.setAlignSelf(Alignment.CENTER);
+        return result;
+    }
+
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        Disposable subscription = todoService.getTodos()
-                .subscribe(this::accessUIAndDrawTodo, this::accessUIAndShowErrorDialog);
+        loadTodos();
+        showLoadingInfo();
+    }
+
+    private void loadTodos() {
+        Disposable subscription = todoService.getTodos().subscribe(
+                this::accessUIAndDrawTodo,
+                this::accessUIAndShowErrorDialog,
+                this::accessUIAndHideLoadingInfo
+        );
         loadTodosDisposable.replace(subscription);
+    }
+
+    private void showLoadingInfo() {
+        loadingInfoLayout.setVisible(Boolean.TRUE);
     }
 
     private void accessUIAndDrawTodo(Todo todo) {
@@ -69,6 +104,10 @@ public class TodoListView extends VerticalLayout {
 
     private void accessUIAndShowErrorDialog(Throwable throwable) {
         accessUIAndExecuteAction(() -> showDialogWithMessage(throwable.getMessage()));
+    }
+
+    private void accessUIAndHideLoadingInfo() {
+        accessUIAndExecuteAction(() -> loadingInfoLayout.setVisible(Boolean.FALSE));
     }
 
     private void accessUIAndExecuteAction(Runnable action) {
