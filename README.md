@@ -43,9 +43,12 @@ public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFact
 }
 ```
 
-### Creating a test
+#### Creating a test
 Test classes requires the following annotations: 
 
 - @ActiveProfile("test"): with this annotation Spring loads the properties from application.properties and from application-test.properties, where the properties defined in application-test.properties override the ones defined in application.properties with the same name.
 - @SpringBootTest(classes = {VaadinReactiveEngineApplication.class}): annotation required for performing integration tests. It creates a SpringBoot application context, using the classes provided as argument. This allows Spring to create the JPA repositories implementations that have to be tested. For more info, see [here](https://reflectoring.io/spring-boot-test/) and [here](https://howtodoinjava.com/spring-boot2/testing/springboottest-annotation/).
 - @RunWith(SpringRunner.class): required for enabling annotations and autowiring when using JUnit 4. No necessary if JUnit 5 is used and the class is already annotated with @SpringBootTest.
+
+
+### Web layer
