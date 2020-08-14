@@ -17,12 +17,17 @@ import it.zanotti.poc.vaadinreactive.portal.components.CreateTodoPanel;
 import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
 import it.zanotti.poc.vaadinreactive.portal.model.SubmitTextEvent;
 import it.zanotti.poc.vaadinreactive.portal.model.TodoUIModel;
+import it.zanotti.poc.vaadinreactive.portal.transformers.TodoCreationTransformer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.Disposables;
 import reactor.core.publisher.Flux;
+
+import java.util.function.Function;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -34,14 +39,17 @@ import reactor.core.publisher.Flux;
 @UIScope
 public class TodoListView extends VerticalLayout {
     private final TodoService todoService;
+    private final TodoCreationTransformer todoCreationTransformer;
     private final Disposable.Swap loadTodosDisposable;
 
     private TodoContainer todoContainer;
     private HorizontalLayout loadingInfoLayout;
     private CreateTodoPanel createTodoPanel;
 
-    public TodoListView(TodoService todoService) {
+    @Autowired
+    public TodoListView(TodoService todoService, TodoCreationTransformer todoCreationTransformer) {
         this.todoService = todoService;
+        this.todoCreationTransformer = todoCreationTransformer;
         this.loadTodosDisposable = Disposables.swap();
         initGui();
     }
@@ -57,13 +65,7 @@ public class TodoListView extends VerticalLayout {
         add(todoContainer);
 
         createTodoPanel.getOnTodoCreateFlux()
-                .map(SubmitTextEvent::getContent)
-                .map(Todo::create)
-                .flatMap(todo -> todoService.saveOrUpdateTodo(todo)
-                        .flux()
-                        .map(TodoUIModel::success)
-                        .startWith(TodoUIModel.inProgress())
-                        .onErrorResume(e -> Flux.just(TodoUIModel.failure(e))))
+                .transform(todoCreationTransformer)
                 .doOnError(e -> log.error("{}", e.getMessage(), e))
                 .subscribe(this::onTodoCreated);
 

@@ -45,7 +45,7 @@ public class EngineTodoService implements TodoService {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("{}", e.getMessage(), e);
         }
 
         return todo;
