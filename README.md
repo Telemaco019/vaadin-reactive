@@ -1,6 +1,11 @@
 # Vaadin Reactive
 This repository contains a simple TODO web-app built for exploring a reactive stack composed of [Vaadin](https://vaadin.com/) + [Spring Web Flux](https://docs.spring.io/spring-framework/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/web-reactive.html) + [R2DBC](https://r2dbc.io/). 
 
+
+## Architecture
+![high-level-architecture](img/architecture.svg)
+
+
 ## Multi-threading
 Multithreading is managed using two Reactor operators: 
 - *subscribeOn*: it allows specifying which Scheduler a source Flux should use for pushing the emissions all the way to the final 
