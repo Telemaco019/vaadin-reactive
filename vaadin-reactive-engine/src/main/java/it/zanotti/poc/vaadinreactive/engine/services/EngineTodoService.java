@@ -53,8 +53,9 @@ public class EngineTodoService implements TodoService {
 
     @Override
     public Mono<Todo> getTodoById(Integer todoId) {
-        return Mono.justOrEmpty(fetchTodoById(todoId))
+        return todoRepository.findById(todoId)
                 .subscribeOn(Schedulers.elastic())
+                .map(converter::convertFromDb)
                 .doOnSuccess(todo -> log.debug("Loaded todo with id {}", todo.getId()))
                 .doOnError(e -> log.error("Error loading todo with id {}: {}", todoId, e.getMessage(), e));
     }
