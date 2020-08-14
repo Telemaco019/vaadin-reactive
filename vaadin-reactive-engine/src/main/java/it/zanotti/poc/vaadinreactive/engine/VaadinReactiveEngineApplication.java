@@ -8,7 +8,7 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 @SpringBootApplication
 public class VaadinReactiveEngineApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(VaadinReactiveEngineApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(VaadinReactiveEngineApplication.class, args);
+    }
 }

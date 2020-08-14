@@ -15,11 +15,14 @@ import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.core.utils.AppConstants;
 import it.zanotti.poc.vaadinreactive.portal.components.CreateTodoPanel;
 import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
+import it.zanotti.poc.vaadinreactive.portal.model.SubmitTextEvent;
+import it.zanotti.poc.vaadinreactive.portal.model.TodoUIModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.Disposables;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -35,6 +38,7 @@ public class TodoListView extends VerticalLayout {
 
     private TodoContainer todoContainer;
     private HorizontalLayout loadingInfoLayout;
+    private CreateTodoPanel createTodoPanel;
 
     public TodoListView(TodoService todoService) {
         this.todoService = todoService;
@@ -43,8 +47,8 @@ public class TodoListView extends VerticalLayout {
     }
 
     private void initGui() {
-        CreateTodoPanel createTodoLayout = new CreateTodoPanel();
-        add(createTodoLayout);
+        createTodoPanel = new CreateTodoPanel();
+        add(createTodoPanel);
 
         loadingInfoLayout = createLoadingInfoLayout();
         add(loadingInfoLayout);
@@ -52,13 +56,30 @@ public class TodoListView extends VerticalLayout {
         todoContainer = new TodoContainer();
         add(todoContainer);
 
-        createTodoLayout.getOnTodoCreateFlux()
+        createTodoPanel.getOnTodoCreateFlux()
+                .map(SubmitTextEvent::getContent)
                 .map(Todo::create)
-                .flatMap(todoService::saveOrUpdateTodo)
+                .flatMap(todo -> todoService.saveOrUpdateTodo(todo)
+                        .flux()
+                        .map(TodoUIModel::success)
+                        .startWith(TodoUIModel.inProgress())
+                        .onErrorResume(e -> Flux.just(TodoUIModel.failure(e))))
                 .doOnError(e -> log.error("{}", e.getMessage(), e))
-                .subscribe(this::accessUIAndDrawTodo, this::accessUIAndShowErrorDialog);
+                .subscribe(this::onTodoCreated);
 
         setAlignItems(Alignment.CENTER);
+    }
+
+    private void onTodoCreated(TodoUIModel uiModel) {
+        if (uiModel.isInProgress()) {
+            accessUIAndExecuteAction(() -> createTodoPanel.clearTextfield());
+        } else {
+            if (uiModel.isSuccess()) {
+                accessUIAndDrawTodo(uiModel.getModel());
+            } else {
+                accessUIAndShowErrorDialog(uiModel.getException());
+            }
+        }
     }
 
     private HorizontalLayout createLoadingInfoLayout() {

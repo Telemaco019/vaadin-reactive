@@ -7,7 +7,6 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.shared.Registration;
 import reactor.core.CoreSubscriber;
-import reactor.core.Disposable;
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 
@@ -16,7 +15,7 @@ import java.util.Objects;
 /**
  * @author Michele Zanotti on 02/08/20
  **/
-public final class RxVaadinBindings {
+public abstract class RxVaadinBindings {
     private RxVaadinBindings() {
         throw new UnsupportedOperationException("Utility class not supposed to be instantiated");
     }

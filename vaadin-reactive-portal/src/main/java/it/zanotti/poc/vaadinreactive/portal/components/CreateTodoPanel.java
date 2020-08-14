@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import it.zanotti.poc.vaadinreactive.portal.model.SubmitTextEvent;
 import it.zanotti.poc.vaadinreactive.portal.utils.RxVaadinBindings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,14 +17,15 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class CreateTodoPanel extends HorizontalLayout {
 
-    private Flux<String> onTodoCreateFlux;
+    private Flux<SubmitTextEvent> onTodoCreateFlux;
+    private TextField todoContentTexField;
 
     public CreateTodoPanel() {
         initGui();
     }
 
     private void initGui() {
-        TextField todoContentTexField = getCreateTodoTextField();
+        todoContentTexField = getCreateTodoTextField();
         add(todoContentTexField);
 
         Button createTodoButton = getCreateTodoButton();
@@ -32,8 +34,7 @@ public class CreateTodoPanel extends HorizontalLayout {
         todoContentTexField.addValueChangeListener(e -> createTodoButton.setEnabled(StringUtils.isNotBlank(e.getValue())));
 
         onTodoCreateFlux = RxVaadinBindings.onButtonClicks(createTodoButton)
-                .map(ignored -> todoContentTexField.getValue())
-                .doOnNext(ignored -> todoContentTexField.setValue(StringUtils.EMPTY)); // accessing the UI here is not good, find another way
+                .map(ignored -> new SubmitTextEvent(todoContentTexField.getValue()));
     }
 
     private Button getCreateTodoButton() {
@@ -55,7 +56,11 @@ public class CreateTodoPanel extends HorizontalLayout {
         return resultTextField;
     }
 
-    public Flux<String> getOnTodoCreateFlux() {
+    public Flux<SubmitTextEvent> getOnTodoCreateFlux() {
         return onTodoCreateFlux;
+    }
+
+    public void clearTextfield() {
+        todoContentTexField.setValue(StringUtils.EMPTY);
     }
 }
