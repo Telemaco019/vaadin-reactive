@@ -15,8 +15,6 @@ The Portal and Engine modules are Spring Boot applications that use [Spring WebF
 All the three modules depend on [Reactor Core](https://github.com/reactor/reactor-core), a library implementing [ReactiveX APIs](https://reactivex.io/)
 that is used for creating and manipulating event streams that goes from the UI down to the data layer and vice-versa.
 
-### Portal
-
 ## Multi-threading
 Multithreading is managed using two Reactor operators: 
 - *subscribeOn*: it allows specifying which Scheduler a source Flux should use for pushing the emissions all the way to the final 
