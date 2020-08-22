@@ -4,7 +4,18 @@ This repository contains a simple TODO web-app built for exploring a reactive st
 
 ## Architecture
 ![high-level-architecture](img/architecture.svg)
+- **Portal**: frontend module in which the Vaadin UI is implemented. 
+- **Engine**: backend module that exposes a _non-blocking_ REST API. It accesses the data on the DB reactively
+using the [R2DBC library](https://r2dbc.io/). 
+- **Core**: library containing the classes (like for instance the model classes) and service definitions common to 
+both the Portal and Engine modules. 
 
+The Portal and Engine modules are Spring Boot applications that use [Spring WebFlux](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/web-reactive.html#webflux), that is the reactive web framework introduced in Spring 5.
+
+All the three modules depend on [Reactor Core](https://github.com/reactor/reactor-core), a library implementing [ReactiveX APIs](https://reactivex.io/)
+that is used for creating and manipulating event streams that goes from the UI down to the data layer and vice-versa.
+
+### Portal
 
 ## Multi-threading
 Multithreading is managed using two Reactor operators: 
