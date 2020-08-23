@@ -2,7 +2,8 @@ package it.zanotti.poc.vaadinreactive.portal.components;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import it.zanotti.poc.vaadinreactive.core.model.Todo;
-import it.zanotti.poc.vaadinreactive.core.services.TodoService;
+import it.zanotti.poc.vaadinreactive.portal.model.Action;
+import it.zanotti.poc.vaadinreactive.portal.transformers.TodoDeletionTransformer;
 import it.zanotti.poc.vaadinreactive.portal.utils.UIUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
@@ -15,10 +16,10 @@ import java.util.List;
 @Slf4j
 public class TodoContainer extends VerticalLayout {
     private final List<TodoItem> containedTodoItems;
-    private final TodoService todoService;
+    private final TodoDeletionTransformer todoDeletionTransformer;
 
-    public TodoContainer(TodoService todoService) {
-        this.todoService = todoService;
+    public TodoContainer(TodoDeletionTransformer todoDeletionTransformer) {
+        this.todoDeletionTransformer = todoDeletionTransformer;
         containedTodoItems = Lists.newArrayList();
         initGui();
     }
@@ -34,13 +35,18 @@ public class TodoContainer extends VerticalLayout {
         containedTodoItems.add(todoItem);
 
         todoItem.getOnTodoDeleteFlux()
-                .flatMap(event -> todoService.deleteTodoById(event.getContent()))
-                .subscribe(
-                        todoId -> accessUIAndExecuteAction(() -> removeTodoItem(todoId)),
-                        this::accessUIAndShowErrorDialog
-                );
+                .transform(todoDeletionTransformer)
+                .subscribe(this::manageTodoDeletion);
 
         add(todoItem);
+    }
+
+    private void manageTodoDeletion(Action<Integer> todoDeletionAction) {
+        if (todoDeletionAction.isInError()) {
+            accessUIAndShowErrorDialog(todoDeletionAction.getException());
+        } else if (todoDeletionAction.isSuccess()) {
+            accessUIAndExecuteAction(() -> removeTodoItem(todoDeletionAction.getModel()));
+        }
     }
 
     private void removeTodoItem(Integer todoId) {

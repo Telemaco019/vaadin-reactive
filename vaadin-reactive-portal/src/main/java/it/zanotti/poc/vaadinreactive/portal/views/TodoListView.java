@@ -14,8 +14,9 @@ import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.core.utils.AppConstants;
 import it.zanotti.poc.vaadinreactive.portal.components.CreateTodoPanel;
 import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
-import it.zanotti.poc.vaadinreactive.portal.model.EventProgress;
+import it.zanotti.poc.vaadinreactive.portal.model.Action;
 import it.zanotti.poc.vaadinreactive.portal.transformers.TodoCreationEventTransformer;
+import it.zanotti.poc.vaadinreactive.portal.transformers.TodoDeletionTransformer;
 import it.zanotti.poc.vaadinreactive.portal.utils.UIUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ import reactor.core.Disposables;
 public class TodoListView extends VerticalLayout {
     private final TodoService todoService;
     private final TodoCreationEventTransformer todoCreationEventTransformer;
+    private final TodoDeletionTransformer todoDeletionTransformer;
     private final Disposable.Swap loadTodosDisposable;
 
     private TodoContainer todoContainer;
@@ -42,9 +44,12 @@ public class TodoListView extends VerticalLayout {
     private CreateTodoPanel createTodoPanel;
 
     @Autowired
-    public TodoListView(TodoService todoService, TodoCreationEventTransformer todoCreationEventTransformer) {
+    public TodoListView(TodoService todoService,
+                        TodoCreationEventTransformer todoCreationEventTransformer,
+                        TodoDeletionTransformer todoDeletionTransformer) {
         this.todoService = todoService;
         this.todoCreationEventTransformer = todoCreationEventTransformer;
+        this.todoDeletionTransformer = todoDeletionTransformer;
         this.loadTodosDisposable = Disposables.swap();
         initGui();
     }
@@ -56,24 +61,25 @@ public class TodoListView extends VerticalLayout {
         loadingInfoLayout = createLoadingInfoLayout();
         add(loadingInfoLayout);
 
-        todoContainer = new TodoContainer(todoService);
+        todoContainer = new TodoContainer(todoDeletionTransformer);
         add(todoContainer);
 
         createTodoPanel.getOnTodoCreateFlux()
                 .transform(todoCreationEventTransformer)
                 .subscribe(this::onTodoCreated);
 
+
         setAlignItems(Alignment.CENTER);
     }
 
-    private void onTodoCreated(EventProgress<Todo> eventProgress) {
-        if (eventProgress.isInProgress()) {
+    private void onTodoCreated(Action<Todo> action) {
+        if (action.isInProgress()) {
             accessUIAndExecuteAction(() -> createTodoPanel.clearTextfield());
         } else {
-            if (eventProgress.isSuccess()) {
-                accessUIAndDrawTodo(eventProgress.getModel());
+            if (action.isSuccess()) {
+                accessUIAndDrawTodo(action.getModel());
             } else {
-                Throwable e = eventProgress.getException();
+                Throwable e = action.getException();
                 log.error("{}", e.getMessage(), e);
                 accessUIAndShowErrorDialog(e);
             }
