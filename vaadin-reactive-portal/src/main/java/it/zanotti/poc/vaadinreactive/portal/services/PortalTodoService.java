@@ -51,4 +51,12 @@ public class PortalTodoService implements TodoService {
                 .retrieve()
                 .bodyToMono(Todo.class);
     }
+
+    @Override
+    public Mono<Integer> deleteTodoById(Integer todoId) {
+        return webClient.delete()
+                .uri("/todos/{id}", todoId)
+                .retrieve()
+                .bodyToMono(Integer.class);
+    }
 }

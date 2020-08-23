@@ -1,14 +1,14 @@
 package it.zanotti.poc.vaadinreactive.portal.components;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import it.zanotti.poc.vaadinreactive.core.model.Todo;
+import it.zanotti.poc.vaadinreactive.portal.model.UIEvent;
+import it.zanotti.poc.vaadinreactive.portal.utils.RxVaadinBindings;
+import reactor.core.publisher.Flux;
 
 import java.time.format.DateTimeFormatter;
 
@@ -19,6 +19,7 @@ public class TodoItem extends VerticalLayout {
     private Label creationDateLabel;
     private Label todoDescriptionLabel;
     private Todo model;
+    private Flux<UIEvent<Integer>> onTodoDeleteFlux;
 
     public TodoItem() {
         initGui();
@@ -65,6 +66,7 @@ public class TodoItem extends VerticalLayout {
     private Button createDeleteButton() {
         Button button = new Button(VaadinIcon.TRASH.create());
         button.getStyle().set("cursor", "pointer");
+        onTodoDeleteFlux = RxVaadinBindings.onButtonClicks(button).map(ignored -> new UIEvent<>(model.getId()));
         return button;
     }
 
@@ -75,6 +77,10 @@ public class TodoItem extends VerticalLayout {
         return layout;
     }
 
+    public Flux<UIEvent<Integer>> getOnTodoDeleteFlux() {
+        return onTodoDeleteFlux;
+    }
+
     public void setModel(Todo model) {
         this.model = model;
         refreshGui();
@@ -83,5 +89,9 @@ public class TodoItem extends VerticalLayout {
     private void refreshGui() {
         creationDateLabel.setText(model.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         todoDescriptionLabel.setText(model.getDescription());
+    }
+
+    public Todo getModel() {
+        return model;
     }
 }

@@ -6,7 +6,7 @@ import lombok.Data;
  * @author Michele Zanotti on 14/08/20
  **/
 @Data
-public abstract class UIEvent<T> {
+public class UIEvent<T> {
     private final T content;
 
     public UIEvent(T content) {

@@ -3,8 +3,7 @@ package it.zanotti.poc.vaadinreactive.portal.transformers;
 import com.vaadin.flow.spring.annotation.UIScope;
 import it.zanotti.poc.vaadinreactive.core.model.Todo;
 import it.zanotti.poc.vaadinreactive.core.services.TodoService;
-import it.zanotti.poc.vaadinreactive.portal.model.SubmitTextEvent;
-import it.zanotti.poc.vaadinreactive.portal.model.TodoUIModel;
+import it.zanotti.poc.vaadinreactive.portal.model.EventProgress;
 import it.zanotti.poc.vaadinreactive.portal.model.UIEvent;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +15,23 @@ import reactor.core.publisher.Flux;
  **/
 @UIScope
 @Component
-public class TodoCreationTransformer implements Transformer<SubmitTextEvent, TodoUIModel> {
+public class TodoCreationEventTransformer implements Transformer<UIEvent<String>, EventProgress<Todo>> {
     private final TodoService todoService;
 
     @Autowired
-    public TodoCreationTransformer(TodoService todoService) {
+    public TodoCreationEventTransformer(TodoService todoService) {
         this.todoService = todoService;
     }
 
     @Override
-    public Publisher<TodoUIModel> apply(Flux<SubmitTextEvent> submitTextEventFlux) {
-        return submitTextEventFlux.map(UIEvent::getContent)
+    public Publisher<EventProgress<Todo>> apply(Flux<UIEvent<String>> stringContentEventFlux) {
+        return stringContentEventFlux.map(UIEvent::getContent)
                 .map(Todo::create)
                 .flatMap(todo -> todoService.saveOrUpdateTodo(todo)
                         .flux()
-                        .map(TodoUIModel::success)
-                        .startWith(TodoUIModel.inProgress())
-                        .onErrorResume(e -> Flux.just(TodoUIModel.failure(e)))
+                        .map(EventProgress::success)
+                        .startWith(EventProgress.inProgress())
+                        .onErrorResume(e -> Flux.just(EventProgress.failure(e)))
                 );
     }
 }

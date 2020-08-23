@@ -13,4 +13,6 @@ public interface TodoService {
     Mono<Todo> getTodoById(Integer todoId);
 
     Mono<Todo> saveOrUpdateTodo(Todo todo);
+
+    Mono<Integer> deleteTodoById(Integer todoId);
 }

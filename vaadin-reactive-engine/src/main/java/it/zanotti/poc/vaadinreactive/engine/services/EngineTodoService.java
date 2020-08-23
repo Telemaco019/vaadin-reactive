@@ -12,8 +12,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.Optional;
-
 /**
  * @author Michele Zanotti on 18/07/20
  **/
@@ -70,7 +68,19 @@ public class EngineTodoService implements TodoService {
                 .doOnError(e -> log.error("Error converting dto to model: {}", e.getMessage()));
     }
 
-    private Optional<Todo> fetchTodoById(Integer todoId) {
-        return Optional.empty();
+    @Override
+    public Mono<Integer> deleteTodoById(Integer todoId) {
+        /*
+        Mono<Void> is always empty, since Void cannot be instantiated. A Mono<Void> it is thus just like a RxJava Completable,
+        that either completes without returning any value or fails. In order to make it return just one item (e.g. the
+        id of the entity that has been deleted), we use .map(void->int) for casting the Mono to a Mono<Integer>
+        and .swithIfEmpty() for mapping the "complete" event to an integer emission.
+         */
+        return todoRepository.deleteById(todoId)
+                .map(aVoid -> todoId) // used just for casting, it will actually never be called
+                .switchIfEmpty(Mono.just(todoId))
+                .subscribeOn(Schedulers.elastic())
+                .doOnSuccess(aVoid -> log.debug("Deleted todo with id {}", todoId))
+                .doOnError(e -> log.error("Error deleting todo with id {}: {}", todoId, e.getMessage(), e));
     }
 }

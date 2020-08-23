@@ -4,6 +4,7 @@ import it.zanotti.poc.vaadinreactive.core.model.Todo;
 import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +42,11 @@ public class TodoController {
     public Mono<Todo> saveOrUpdateTodo(@RequestBody Todo todo) {
         log.info("Received save or update todo request");
         return todoService.saveOrUpdateTodo(todo);
+    }
+
+    @DeleteMapping("/api/todos/{todoId}")
+    public Mono<Integer> deleteTodoById(@PathVariable Integer todoId) {
+        log.info("Received delete todo by id {} request", todoId);
+        return todoService.deleteTodoById(todoId);
     }
 }

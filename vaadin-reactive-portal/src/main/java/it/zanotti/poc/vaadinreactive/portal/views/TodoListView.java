@@ -3,7 +3,6 @@ package it.zanotti.poc.vaadinreactive.portal.views;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,19 +14,15 @@ import it.zanotti.poc.vaadinreactive.core.services.TodoService;
 import it.zanotti.poc.vaadinreactive.core.utils.AppConstants;
 import it.zanotti.poc.vaadinreactive.portal.components.CreateTodoPanel;
 import it.zanotti.poc.vaadinreactive.portal.components.TodoContainer;
-import it.zanotti.poc.vaadinreactive.portal.model.SubmitTextEvent;
-import it.zanotti.poc.vaadinreactive.portal.model.TodoUIModel;
-import it.zanotti.poc.vaadinreactive.portal.transformers.TodoCreationTransformer;
+import it.zanotti.poc.vaadinreactive.portal.model.EventProgress;
+import it.zanotti.poc.vaadinreactive.portal.transformers.TodoCreationEventTransformer;
+import it.zanotti.poc.vaadinreactive.portal.utils.UIUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.Disposables;
-import reactor.core.publisher.Flux;
-
-import java.util.function.Function;
 
 /**
  * @author Michele Zanotti on 19/07/20
@@ -39,7 +34,7 @@ import java.util.function.Function;
 @UIScope
 public class TodoListView extends VerticalLayout {
     private final TodoService todoService;
-    private final TodoCreationTransformer todoCreationTransformer;
+    private final TodoCreationEventTransformer todoCreationEventTransformer;
     private final Disposable.Swap loadTodosDisposable;
 
     private TodoContainer todoContainer;
@@ -47,9 +42,9 @@ public class TodoListView extends VerticalLayout {
     private CreateTodoPanel createTodoPanel;
 
     @Autowired
-    public TodoListView(TodoService todoService, TodoCreationTransformer todoCreationTransformer) {
+    public TodoListView(TodoService todoService, TodoCreationEventTransformer todoCreationEventTransformer) {
         this.todoService = todoService;
-        this.todoCreationTransformer = todoCreationTransformer;
+        this.todoCreationEventTransformer = todoCreationEventTransformer;
         this.loadTodosDisposable = Disposables.swap();
         initGui();
     }
@@ -61,25 +56,26 @@ public class TodoListView extends VerticalLayout {
         loadingInfoLayout = createLoadingInfoLayout();
         add(loadingInfoLayout);
 
-        todoContainer = new TodoContainer();
+        todoContainer = new TodoContainer(todoService);
         add(todoContainer);
 
         createTodoPanel.getOnTodoCreateFlux()
-                .transform(todoCreationTransformer)
-                .doOnError(e -> log.error("{}", e.getMessage(), e))
+                .transform(todoCreationEventTransformer)
                 .subscribe(this::onTodoCreated);
 
         setAlignItems(Alignment.CENTER);
     }
 
-    private void onTodoCreated(TodoUIModel uiModel) {
-        if (uiModel.isInProgress()) {
+    private void onTodoCreated(EventProgress<Todo> eventProgress) {
+        if (eventProgress.isInProgress()) {
             accessUIAndExecuteAction(() -> createTodoPanel.clearTextfield());
         } else {
-            if (uiModel.isSuccess()) {
-                accessUIAndDrawTodo(uiModel.getModel());
+            if (eventProgress.isSuccess()) {
+                accessUIAndDrawTodo(eventProgress.getModel());
             } else {
-                accessUIAndShowErrorDialog(uiModel.getException());
+                Throwable e = eventProgress.getException();
+                log.error("{}", e.getMessage(), e);
+                accessUIAndShowErrorDialog(e);
             }
         }
     }
@@ -126,7 +122,7 @@ public class TodoListView extends VerticalLayout {
     }
 
     private void accessUIAndShowErrorDialog(Throwable throwable) {
-        accessUIAndExecuteAction(() -> showDialogWithMessage(throwable.getMessage()));
+        accessUIAndExecuteAction(() -> UIUtils.showDialogWithMessage(throwable.getMessage()));
     }
 
     private void accessUIAndHideLoadingInfo() {
@@ -139,11 +135,5 @@ public class TodoListView extends VerticalLayout {
 
     private TodoContainer getTodoContainer() {
         return todoContainer;
-    }
-
-    private void showDialogWithMessage(String message) {
-        Dialog dialog = new Dialog();
-        dialog.add(new Label(message));
-        dialog.open();
     }
 }
